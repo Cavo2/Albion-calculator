@@ -7,8 +7,25 @@ Object.prototype.setAttributes = function () {
 	}
 }
 
+// Get's the last element of an Array
+
+Object.defineProperties(Array.prototype, {
+    last: {
+        get(){
+            return this[this.length - 1]
+        }
+    }
+})
+
+
+
+
+// Get's the two main divs
+
 let sum = document.getElementsByClassName( 'sum' )[0];
 let sub = document.getElementsByClassName( 'sub' )[0];
+
+// Create's ADD button div in both main divs
 
 function newButtonDiv( e ) {
     for( let i = 0; i < e.length; i++ ) {
@@ -21,12 +38,18 @@ function newButtonDiv( e ) {
         div.appendChild( input );
     }
 }
-
+    // Calls the Function to create it
 newButtonDiv( [ sum, sub ] )
+
+
+
+
+// Get's both ADD div buttons
 
 let firstAddButton = document.getElementsByClassName( 'newButton' )[0];
 let lastAddButton = document.getElementsByClassName( 'newButton' )[1];
 
+// Set's create element event listener to the two buttons
 
 function newElement( e, parentToLink ) {
     e.addEventListener( 'click', function () {
@@ -43,15 +66,18 @@ function newElement( e, parentToLink ) {
             <input type="text"></input>
         </div>
         `;
-        parentToLink.prepend( div );
+        parentToLink.insertBefore( div, [ ...parentToLink.children ].last );
+
+        // Calls removeButton function if there is at least 1 Calc div
 
         removeButton( e )
     })
 }
-
+    // Call newElement to add the events
 newElement( firstAddButton, sum )
 newElement( lastAddButton, sub )
 
+// Add a remove Button, this is called if there is at least 1 Calc div in the section
 
 function removeButton ( e ) {
     if( e.parentNode.children.length === 2 ) {
@@ -65,6 +91,8 @@ function removeButton ( e ) {
         let mainDiv = e.parentNode.parentNode;
         mainDiv.children[ mainDiv.children.length - 2 ].remove();
 
+        // Remove this 'removeButton' if there is no Calc div in the section
+
         if( mainDiv.children.length === 1 ) {
             input.remove()
         }
@@ -72,29 +100,65 @@ function removeButton ( e ) {
 }
 
 
+// Get's the Calc input
+
 let calc = document.getElementsByClassName( 'calc' )[ 0 ];
 
+
 calc.addEventListener( 'click', function() {
-    let arry = [ add = 0, subtract = 0 ];
+    // Get's the childrens of the two main divs
     let sumChilds = sum.children;
     let subChilds = sub.children;
 
-    function addSubAmount( element, n ) {
+    // Loop into the two divs and sum the values
+
+    function addSubAmount( element ) {
+        let result = 0;
+
         for( let i = 0; i < element.length - 1; i++ ) {
             let arr = [];
+
             Object.values( element[i].children ).forEach( e => {
                 let value = e.children[1].value;
                 value === "" ? arr.push( 1 ) : arr.push( parseFloat(value) );
             })
+
             if( arr[0] !== 1 || arr[1] !== 1 ){
-                arry[n] += arr[0] * arr[1];
+                result += arr[0] * arr[1];
             }
         }
+
+        return result;
     }
 
-    addSubAmount( sumChilds, 0 );
-    addSubAmount( subChilds, 1 );
+    // Get's the values and subtract them
 
-    let result = arry[0] - arry[1];
+    let add = addSubAmount( sumChilds );
+    let subtract = addSubAmount( subChilds );
+
+    let result = add - subtract;
+
+    // Alert the result
+
     alert( 'Puuuu: ' + result );
+})
+
+
+// Remove all elements if the body is clicked 
+
+document.body.addEventListener( 'click', function ( e ) {
+    if ( e.target !== document.body ){
+        return;
+    }
+    function remove ( e ) {
+        let childs = e.children;
+        while ( childs.length > 1 ) {
+            // Clicks the remove's button
+            let removeButtonsDiv = [ ...childs ].last;
+            let removeButton = [ ...removeButtonsDiv.children ].last;
+            removeButton.click();
+        }
+    }
+    remove( sum )
+    remove( sub )
 })
