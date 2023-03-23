@@ -1,7 +1,9 @@
 body{
-    background: black;
+    min-height: 98vh;
     display: grid;
+    grid-auto-rows: minmax( 20vh, min-content );
     justify-items: center;
+    background: black;
     gap: 5px;
 }
 
